@@ -63,7 +63,7 @@ class Room {
   }
 };
 
-class GameMap {
+export class GameMap {
   private rooms: Array<Array<Room>>;
   private offset: { row: number, column: number } = { row: 0, column: 0 }
 
@@ -79,5 +79,9 @@ class GameMap {
     for (let i = 0; i < numDeadEnds; ++i) {
       deadEnds.push()
     }
+  }
+
+  get getRooms() {
+    return this.rooms;
   }
 }
