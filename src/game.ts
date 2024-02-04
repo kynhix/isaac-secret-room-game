@@ -1,4 +1,4 @@
-type RoomType = "empty" | "boss" | "treasure" | "cursed" | "shop" | "secret";
+type RoomType = "empty" | "boss" | "treasure" | "cursed" | "shop" | "secret" | "sacrafice" | "miniboss";
 
 class Room {
   private neighbors: {
@@ -54,12 +54,30 @@ class Room {
     return this.deadEnd;
   }
 
+  isOrigin() {
+    return this.position.row == 0 && this.position.column == 0;
+  }
+
   set setDistanceToCenter(dist: number) {
     this.distToCenter = dist;
   }
 };
 
-
 class GameMap {
-  rooms = {};
+  private rooms: Array<Array<Room>>;
+  private offset: { row: number, column: number } = { row: 0, column: 0 }
+
+  constructor(rooms = 20) {
+    this.rooms = [[new Room(0, 0, 0, false)]]
+    this.generateMap(rooms);
+  }
+
+  private generateMap(rooms: number) {
+    // generate dead ends
+    const numDeadEnds = Math.max(4);
+    const deadEnds: Room[] = [];
+    for (let i = 0; i < numDeadEnds; ++i) {
+      deadEnds.push()
+    }
+  }
 }

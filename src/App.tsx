@@ -7,6 +7,7 @@ const App: Component = () => {
     <div class={styles.App}>
       <header class={styles.header}>
       </header>
+      <div class='flex'></div>
     </div>
   );
 };
