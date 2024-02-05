@@ -72,13 +72,13 @@ export class GameMap {
     this.generateMap(rooms);
   }
 
-  private generateMap(rooms: number) {
-    // generate dead ends
-    const numDeadEnds = Math.max(4);
-    const deadEnds: Room[] = [];
-    for (let i = 0; i < numDeadEnds; ++i) {
-      deadEnds.push()
-    }
+  private generateMap(totalRooms: number) {
+    // running total of rooms
+    let rooms = totalRooms;
+    // number of branches from main room
+    const branches = 2 + Math.round(Math.random() * 2);
+    this.rooms[0].push(undefined)
+
   }
 
   get getRooms() {
