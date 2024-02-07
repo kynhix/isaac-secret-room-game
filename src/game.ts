@@ -1,6 +1,6 @@
-type RoomType = "empty" | "boss" | "treasure" | "cursed" | "shop" | "secret" | "sacrafice" | "miniboss";
+export type RoomType = "empty" | "boss" | "treasure" | "cursed" | "shop" | "secret" | "super-secret" | "sacrafice" | "miniboss" | "unknown";
 
-class Room {
+export class Room {
   private neighbors: {
     up?: Room,
     down?: Room,
@@ -14,9 +14,9 @@ class Room {
   private position: { row: number, column: number };
   private deadEnd: boolean;
 
-  constructor(row: number, column: number, dist: number, deadEnd: boolean) {
+  constructor(row: number, column: number, dist: number, deadEnd: boolean, type: RoomType = "empty") {
     this.neighbors = {};
-    this.type = "empty";
+    this.type = type;
     this.position = { row: row, column: column };
     this.distToCenter = dist;
     this.deadEnd = deadEnd;
@@ -26,19 +26,19 @@ class Room {
     return Object.keys(this.neighbors).length;
   }
 
-  get getType() {
+  getType() {
     return this.type;
   }
 
-  set setType(type: RoomType) {
+  setType(type: RoomType) {
     this.type = type;
   }
 
-  get getPosition() {
+  getPosition() {
     return { ...this.position };
   }
 
-  get getNeighbors() {
+  getNeighbors() {
     return { ...this.neighbors };
   }
 
@@ -46,11 +46,11 @@ class Room {
     this.neighbors[position] = node;
   }
 
-  get getDistanceToCenter() {
+  getDistanceToCenter() {
     return this.distToCenter;
   }
 
-  get isDeadEnd() {
+  isDeadEnd() {
     return this.deadEnd;
   }
 
@@ -63,22 +63,22 @@ class Room {
   }
 };
 
-export class GameMap {
+export class Floor {
   private rooms: Array<Array<Room>>;
   private offset: { row: number, column: number } = { row: 0, column: 0 }
 
   constructor(rooms = 20) {
-    this.rooms = [[new Room(0, 0, 0, false)]]
-    this.generateMap(rooms);
+    this.rooms = [[]];
+    this.generateFloor(rooms);
   }
 
-  private generateMap(totalRooms: number) {
+  private generateFloor(totalRooms: number) {
+    this.rooms = [[new Room(0, 0, 0, false)]]
     // running total of rooms
     let rooms = totalRooms;
     // number of branches from main room
-    const branches = 2 + Math.round(Math.random() * 2);
-    this.rooms[0].push(undefined)
-
+    const branches = 1 + Math.round(Math.random() * 2.1 - 0.5);
+    this.rooms[0].push(new Room(1, 0, 0, false, "empty"));
   }
 
   get getRooms() {
