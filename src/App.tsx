@@ -1,4 +1,4 @@
-import { For, createSignal, type Component } from 'solid-js';
+import { For, createSignal, type Component, Show } from 'solid-js';
 import { Floor, Room } from './game';
 
 const App: Component = () => {
@@ -31,10 +31,14 @@ const App: Component = () => {
       <div class='text-black'>
         <For each={floor().getRooms}>{(row) =>
           <div class='flex flex-row'>
-            <For each={row}>{(room) =>
-              <Show when={room !== undefined}>
-                <div class={`w-16 text-center aspect-square ${getRoomStyle(room)} ${room.isOrigin() && ' after:content-["Spawn"]'}`} onclick={() => onClickRoom(room)}></div>
-              </Show>
+            <For each={row}>{(room) => {
+              // Don't display undefined rooms
+              return room &&
+                <div class={`w-16 text-center aspect-square ${getRoomStyle(room)} ${room.isOrigin() && ' after:content-["Spawn"]'}`} onclick={() => onClickRoom(room)}>
+                  <div>{room.getDistanceToCenter()}</div>
+                </div>
+                || <div class='w-16 text-center aspect-square'></div>
+            }
             }</For>
           </div>
         }</For>

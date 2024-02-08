@@ -78,10 +78,10 @@ export class Floor {
   private rooms: Array<Array<Room | undefined>>;
   private offset: { row: number, column: number } = { row: 0, column: 0 }
   private getRowIndex(row: number) {
-    return row - this.offset.row;
+    return row + this.offset.row;
   }
   private getColIndex(row: number) {
-    return row - this.offset.column;
+    return row + this.offset.column;
   }
   private setRoomAtCoord(room: Room, row: number, column: number) {
     row = this.getRowIndex(row);
@@ -109,11 +109,12 @@ export class Floor {
       if (!neighbors.up) {
         if (this.getRowIndex(room.row - 1) < 0) {
           this.rooms.unshift(Array(this.rooms.length))
-          this.offset.row -= 1;
+          this.offset.row += 1;
         }
         const newRoom = new Room(room.row - 1, room.column, room.getDistanceToCenter() + 1, false, "unknown");
         this.setRoomAtCoord(newRoom, room.row - 1, room.column);
         room.setNeighbor("up", newRoom);
+        newRoom.setNeighbor("down", room);
       }
       if (!neighbors.down) {
         if (this.getRowIndex(room.row + 1) >= this.rooms.length) {
@@ -122,6 +123,26 @@ export class Floor {
         const newRoom = new Room(room.row + 1, room.column, room.getDistanceToCenter() + 1, false, "unknown");
         this.setRoomAtCoord(newRoom, room.row + 1, room.column);
         room.setNeighbor("down", newRoom);
+        newRoom.setNeighbor("up", room);
+      }
+      if (!neighbors.left) {
+        if (this.getColIndex(room.column - 1) < 0) {
+          this.rooms.forEach((row) => row.unshift(undefined));
+          this.offset.column += 1;
+        }
+        const newRoom = new Room(room.row, room.column - 1, room.getDistanceToCenter() + 1, false, "unknown");
+        this.setRoomAtCoord(newRoom, room.row, room.column - 1);
+        room.setNeighbor("left", newRoom);
+        newRoom.setNeighbor("right", room);
+      }
+      if (!neighbors.left) {
+        if (this.getColIndex(room.column + 1) < 0) {
+          this.rooms.forEach((row) => row.push(undefined));
+        }
+        const newRoom = new Room(room.row, room.column + 1, room.getDistanceToCenter() + 1, false, "unknown");
+        this.setRoomAtCoord(newRoom, room.row, room.column + 1);
+        room.setNeighbor("right", newRoom);
+        newRoom.setNeighbor("left", room);
       }
     }
 
