@@ -75,8 +75,19 @@ export class Room {
 };
 
 export class Floor {
-  private rooms: Array<Array<Room>>;
+  private rooms: Array<Array<Room | undefined>>;
   private offset: { row: number, column: number } = { row: 0, column: 0 }
+  private getRowIndex(row: number) {
+    return row - this.offset.row;
+  }
+  private getColIndex(row: number) {
+    return row - this.offset.column;
+  }
+  private setRoomAtCoord(room: Room, row: number, column: number) {
+    row = this.getRowIndex(row);
+    column = this.getColIndex(column);
+    this.rooms[row][column] = room;
+  }
 
   constructor(rooms = 20) {
     this.rooms = [[]];
@@ -84,35 +95,44 @@ export class Floor {
   }
 
   private generateFloor(totalRooms: number) {
-    const rooms = [new Room(0, 0, 0, false)];
+    const rooms = [new Room(0, 0, 0, false, "unknown")];
     this.rooms = [[rooms[0]]];
     // running total of rooms
     let roomsLeft = totalRooms;
 
+    const placeUnknownsAround = (room: Room) => {
+      if (room.getType() != 'unknown') {
+        console.error("Invalid room type: ", room.getType());
+        return;
+      }
+      const neighbors = room.getNeighbors();
+      if (!neighbors.up) {
+        if (this.getRowIndex(room.row - 1) < 0) {
+          this.rooms.unshift(Array(this.rooms.length))
+          this.offset.row -= 1;
+        }
+        const newRoom = new Room(room.row - 1, room.column, room.getDistanceToCenter() + 1, false, "unknown");
+        this.setRoomAtCoord(newRoom, room.row - 1, room.column);
+        room.setNeighbor("up", newRoom);
+      }
+      if (!neighbors.down) {
+        if (this.getRowIndex(room.row + 1) >= this.rooms.length) {
+          this.rooms.push(Array(this.rooms[0].length))
+        }
+        const newRoom = new Room(room.row + 1, room.column, room.getDistanceToCenter() + 1, false, "unknown");
+        this.setRoomAtCoord(newRoom, room.row + 1, room.column);
+        room.setNeighbor("down", newRoom);
+      }
+    }
+
     const createDeadEnd = (maxLength: number) => {
-      let locations: { row: number, column: number }[] = rooms.reduce((arr, room) => {
-        const neighbors = room.getNeighbors();
-        if (!neighbors.up && this.getNeighbors(room.row - 1, room.column).length == 0) {
-          arr.push({ row: room.row - 1, column: room.column });
-        }
-        if (!neighbors.down && this.getNeighbors(room.row + 1, room.column).length == 0) {
-          arr.push({ row: room.row + 1, column: room.column });
-        }
-        if (!neighbors.left && this.getNeighbors(room.row, room.column - 1).length == 0) {
-          arr.push({ row: room.row, column: room.column - 1 });
-        }
-        if (!neighbors.right && this.getNeighbors(room.row, room.column + 1).length == 0) {
-          arr.push({ row: room.row, column: room.column + 1 });
-        }
-        return arr;
-      }, new Array());
-      console.log(locations)
       while (maxLength) {
         --maxLength;
       }
     }
+    placeUnknownsAround(rooms[0]);
+    rooms[0].setType("empty");
     createDeadEnd(Math.round(roomsLeft / 3));
-    this.rooms[0].push(new Room(1, 0, 0, false, "empty"));
   }
 
   getNeighbors(row: number, column: number, outOfBoundsCheck = true) {

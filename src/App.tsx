@@ -6,6 +6,8 @@ const App: Component = () => {
 
   const getRoomStyle = (room: Room) => {
     switch (room.getType()) {
+      case "empty":
+        return room.isOrigin() ? "bg-neutral-300" : "bg-white";
       case "boss":
         return 'bg-red-500';
       case "unknown":
@@ -30,7 +32,9 @@ const App: Component = () => {
         <For each={floor().getRooms}>{(row) =>
           <div class='flex flex-row'>
             <For each={row}>{(room) =>
-              <div class={`w-16 text-center aspect-square ${getRoomStyle(room)} ${room.isOrigin() && ' bg-neutral-300 after:content-["Spawn"]'}`} onclick={() => onClickRoom(room)}></div>
+              <Show when={room !== undefined}>
+                <div class={`w-16 text-center aspect-square ${getRoomStyle(room)} ${room.isOrigin() && ' after:content-["Spawn"]'}`} onclick={() => onClickRoom(room)}></div>
+              </Show>
             }</For>
           </div>
         }</For>
