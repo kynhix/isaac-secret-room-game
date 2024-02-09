@@ -26,24 +26,27 @@ const App: Component = () => {
   }
 
   return (
-    <div class='relative flex flex-col h-screen bg-neutral-900 justify-center items-center'>
-      <h1 class='absolute top-20 text-2xl font-bold text-white'>The Binding of Isaac: <span class='text-blue-400'>Secret Room Game</span></h1>
-      <div class='text-black'>
-        <For each={floor().getRooms}>{(row) =>
-          <div class='flex flex-row'>
-            <For each={row}>{(room) => {
-              // Don't display undefined rooms
-              return room &&
-                <div class={`w-16 text-center aspect-square ${getRoomStyle(room)} ${room.isOrigin() && ' after:content-["Spawn"]'}`} onclick={() => onClickRoom(room)}>
-                  <div>{room.getDistanceToCenter()}</div>
-                </div>
-                || <div class='w-16 text-center aspect-square'></div>
-            }
-            }</For>
-          </div>
-        }</For>
+    <>
+      <div class='relative flex flex-col min-h-screen h-fit bg-neutral-900 justify-center items-center'>
+        <h1 class='absolute top-20 text-2xl font-bold text-white'>The Binding of Isaac: <span class='text-blue-400'>Secret Room Game</span></h1>
+        <div class='text-black'>
+          <For each={floor().getRooms}>{(row) =>
+            <div class='flex flex-row'>
+              <For each={row}>{(room) => {
+                // Don't display undefined rooms
+                return room &&
+                  <div class={`w-16 text-center aspect-square ${getRoomStyle(room)} ${room.isOrigin() && ' after:content-["Spawn"]'}`} onclick={() => onClickRoom(room)}>
+                    <div>{room.getDistanceToCenter()}</div>
+                  </div>
+                  || <div class='w-16 text-center aspect-square'></div>
+              }
+              }</For>
+            </div>
+          }</For>
+        </div>
       </div>
-    </div>
+      <div class='h-24'></div>
+    </>
   );
 };
 
