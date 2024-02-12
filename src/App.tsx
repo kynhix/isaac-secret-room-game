@@ -27,7 +27,7 @@ const App: Component = () => {
   }
 
   return (
-    <>
+    <div class='bg-neutral-900'>
       <div class='relative flex flex-col min-h-screen h-fit justify-center items-center'>
         <h1 class='absolute top-20 text-4xl font-bold text-white'>The Binding of Isaac: <span class='text-blue-400'>Secret Room Game</span></h1>
         <div class='text-black'>
@@ -50,7 +50,7 @@ const App: Component = () => {
       <div class='h-24 p-4 flex flex-col justify-end'>
         <div class="text-white">Made with SolidJS and TailwindCSS.</div>
       </div>
-    </>
+    </div>
   );
 };
 
