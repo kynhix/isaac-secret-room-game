@@ -59,7 +59,7 @@ export class Room {
     return this.position.row == 0 && this.position.column == 0;
   }
 
-  set setDistanceToCenter(dist: number) {
+  setDistanceToCenter(dist: number) {
     this.distToCenter = dist;
   }
 };
@@ -101,44 +101,56 @@ export class Floor {
     // initialize spawn room
     this.roomsArray = [new Room(0, 0, 0, false, "unknown")];
     this.roomsMatrix = [[this.roomsArray[0]]];
-    this.addRoom(0, 0, "empty");
+    this.placeRoom(0, 0, "empty");
     // running total of rooms left to create
     let roomsLeft = totalRooms;
 
+    const branchFilter = (room: Room) => {
+      return this.getUndefinedNeighbors(room)
+        && this.getRoomNeighbors(room) == 1
+        && !this.isUnknownDeadEnd(room)
+    }
+
     const createDeadEnd = (maxLength: number) => {
-      const rooms = this.roomsArray.filter((room) => this.getUndefinedNeighbors(room.row, room.column) && this.getRoomNeighbors(room.row, room.column) == 1);
+      let rooms = this.roomsArray.filter(branchFilter);
       if (!rooms.length) {
         console.error("Could not find a valid branch coordinate.")
         return;
       }
-      let room = getRandomElement(rooms);
-      console.log(room)
+      let room: Room | undefined;
       while (maxLength) {
-        this.addRoom(room.row, room.column, "empty");
-        const rooms = Object.values(this.getNeighbors(room.row, room.column)).filter((room) => this.getUndefinedNeighbors(room.row, room.column) && this.getRoomNeighbors(room.row, room.column) == 1);
+        room = getRandomElement(rooms);
+        this.placeRoom(room.row, room.column, "empty");
+        rooms = Object.values(this.getNeighbors(room)).filter(branchFilter)
         if (!rooms.length) {
+          console.warn("Had to end early")
           room.setDeadEnd(true);
           return;
         }
-        room = getRandomElement(rooms);
         --maxLength;
       }
+      room?.setDeadEnd(true);
     }
     createDeadEnd(Math.round(roomsLeft / 3));
+    createDeadEnd(Math.round(roomsLeft / 3 - 1));
   }
 
   /** Returns the number of undefined neighbors */
-  public getUndefinedNeighbors(row: number, column: number) {
-    return 4 - Object.keys(this.getNeighbors(row, column)).length;
+  public getUndefinedNeighbors(room: Room) {
+    return 4 - Object.keys(this.getNeighbors(room)).length;
   }
 
   /** Returns the number of non-unknown rooms connected */
-  public getRoomNeighbors(row: number, column: number) {
-    return Object.values(this.getNeighbors(row, column))
+  public getRoomNeighbors(room: Room) {
+    return Object.values(this.getNeighbors(room))
       .reduce((prev, room) => prev + (room.getType() != 'unknown' ? 1 : 0), 0);
   }
 
-  private addRoom(row: number, column: number, type: RoomType) {
+  public isUnknownDeadEnd(room: Room) {
+    return Object.values(this.getNeighbors(room)).some((room) => room.isDeadEnd());
+  }
+
+  private placeRoom(row: number, column: number, type: RoomType) {
     const room = this.getRoomAtCoord(row, column);
     if (!room) {
       console.error("Invalid room coordinate:", row, column);
@@ -146,6 +158,20 @@ export class Floor {
     }
     room.setType(type);
     this.placeUnknownsAround(room);
+    this.updateDistToCenter(room);
+  }
+
+  private updateDistToCenter(room: Room) {
+    if (room.getType() == 'unknown') {
+      console.warn('Will not update distance to center of unknown room type.')
+      return;
+    }
+    const neighbors = Object.values(this.getNeighbors(room)).filter((room) => room.getType() != 'unknown');
+    if (!neighbors.length) {
+      return;
+    }
+    const dist = neighbors.reduce((prev, cur) => Math.min(prev, cur.getDistanceToCenter()), 1337);
+    room.setDistanceToCenter(dist + 1);
   }
 
   private placeUnknownsAround(room: Room) {
@@ -153,7 +179,7 @@ export class Floor {
       console.error("Cannot place rooms around room type 'unknown'");
       return;
     }
-    const neighbors = this.getNeighbors(room.row, room.column);
+    const neighbors = this.getNeighbors(room);
     if (!neighbors.up) {
       if (this.getRowIndex(room.row - 1) < 0) {
         this.roomsMatrix.unshift(Array(this.roomsMatrix[0].length))
@@ -192,9 +218,9 @@ export class Floor {
     }
   }
 
-  public getNeighbors(row: number, column: number) {
-    row = this.getRowIndex(row);
-    column = this.getColIndex(column);
+  public getNeighbors(room: Room) {
+    const row = this.getRowIndex(room.row);
+    const column = this.getColIndex(room.column);
     const neighbors: Neighbors = {};
     if (!this.roomsMatrix[row][column]) {
       console.error("Invalid coordinates: ", row, column)
