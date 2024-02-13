@@ -90,6 +90,10 @@ export class Floor {
   private setRoomAtCoord(room: Room, row: number, column: number) {
     row = this.getRowIndex(row);
     column = this.getColIndex(column);
+    if (row < 0 || column < 0 || row >= this.roomsMatrix.length || column >= this.roomsMatrix[0].length) {
+      console.error("Cannot set room outside of boundaries ", row, column);
+      return;
+    }
     this.roomsMatrix[row][column] = room;
   }
 
@@ -105,34 +109,43 @@ export class Floor {
     // running total of rooms left to create
     let roomsLeft = totalRooms;
 
-    const branchFilter = (room: Room) => {
-      return this.getUndefinedNeighbors(room)
-        && this.getRoomNeighbors(room) == 1
-        && !this.isUnknownDeadEnd(room)
-    }
+    const createDeadEnd = (maxDist: number) => {
+      const branchFilter = (room: Room) => {
+        return room.getDistanceToCenter() <= maxDist
+          && this.getUndefinedNeighbors(room)
+          && this.getRoomNeighbors(room) == 1
+          && !this.isUnknownDeadEnd(room)
+      }
 
-    const createDeadEnd = (maxLength: number) => {
       let rooms = this.roomsArray.filter(branchFilter);
       if (!rooms.length) {
         console.error("Could not find a valid branch coordinate.")
         return;
       }
+
       let room: Room | undefined;
-      while (maxLength) {
+      for (let i = 0; i < maxDist; ++i) {
         room = getRandomElement(rooms);
         this.placeRoom(room.row, room.column, "empty");
         rooms = Object.values(this.getNeighbors(room)).filter(branchFilter)
         if (!rooms.length) {
-          console.warn("Had to end early")
+          // console.warn("Had to end early")
           room.setDeadEnd(true);
           return;
         }
-        --maxLength;
       }
       room?.setDeadEnd(true);
     }
     createDeadEnd(Math.round(roomsLeft / 3));
     createDeadEnd(Math.round(roomsLeft / 3 - 1));
+
+    const placeSecretRoom = () => {
+      const unknownRooms = this.roomsArray.filter((room) => room.getType() == 'unknown');
+      const maxRoomNeighbors = unknownRooms.reduce((n, room) => Math.max(n, this.getRoomNeighbors(room)), 0);
+      const candidates = unknownRooms.filter((room) => this.getRoomNeighbors(room) == maxRoomNeighbors && !this.isRoomConnectedToBoss(room));
+      // console.log(candidates.length);
+    }
+    // placeSecretRoom();
   }
 
   /** Returns the number of undefined neighbors */
@@ -146,6 +159,12 @@ export class Floor {
       .reduce((prev, room) => prev + (room.getType() != 'unknown' ? 1 : 0), 0);
   }
 
+  public isRoomConnectedToBoss(room: Room) {
+    return Object.values(this.getNeighbors(room)).some(room => room.getType() == 'boss');
+  }
+
+  /** Returns whether or not an unknown room is connected to a dead end
+   * and therefore should not be considered when creating a branch. */
   public isUnknownDeadEnd(room: Room) {
     return Object.values(this.getNeighbors(room)).some((room) => room.isDeadEnd());
   }
@@ -180,6 +199,12 @@ export class Floor {
       return;
     }
     const neighbors = this.getNeighbors(room);
+    const allSameSize = () => {
+      if (this.roomsMatrix.some((row) => row.length != this.roomsMatrix[0].length)) {
+        console.error("NOT SAME SIZE")
+        throw "FUCK"
+      }
+    }
     if (!neighbors.up) {
       if (this.getRowIndex(room.row - 1) < 0) {
         this.roomsMatrix.unshift(Array(this.roomsMatrix[0].length))
@@ -189,6 +214,7 @@ export class Floor {
       const newRoom = new Room(room.row - 1, room.column, room.getDistanceToCenter() + 1, false, "unknown");
       this.setRoomAtCoord(newRoom, room.row - 1, room.column);
       this.roomsArray.push(newRoom);
+      allSameSize();
     }
     if (!neighbors.down) {
       if (this.getRowIndex(room.row + 1) >= this.roomsMatrix.length) {
@@ -197,6 +223,7 @@ export class Floor {
       const newRoom = new Room(room.row + 1, room.column, room.getDistanceToCenter() + 1, false, "unknown");
       this.setRoomAtCoord(newRoom, room.row + 1, room.column);
       this.roomsArray.push(newRoom);
+      allSameSize();
     }
     if (!neighbors.left) {
       if (this.getColIndex(room.column - 1) < 0) {
@@ -207,14 +234,16 @@ export class Floor {
       const newRoom = new Room(room.row, room.column - 1, room.getDistanceToCenter() + 1, false, "unknown");
       this.setRoomAtCoord(newRoom, room.row, room.column - 1);
       this.roomsArray.push(newRoom);
+      allSameSize();
     }
     if (!neighbors.right) {
-      if (this.getColIndex(room.column + 1) < 0) {
+      if (this.getColIndex(room.column + 1) >= this.roomsMatrix[0].length) {
         this.roomsMatrix.forEach((row) => row.push(undefined));
       }
       const newRoom = new Room(room.row, room.column + 1, room.getDistanceToCenter() + 1, false, "unknown");
       this.setRoomAtCoord(newRoom, room.row, room.column + 1);
       this.roomsArray.push(newRoom);
+      allSameSize();
     }
   }
 
