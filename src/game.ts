@@ -51,6 +51,10 @@ export class Room {
     return this.deadEnd;
   }
 
+  isVisible() {
+    return this.type != 'unknown' && this.type != 'secret' && this.type != 'super-secret';
+  }
+
   setDeadEnd(deadend: boolean) {
     this.deadEnd = deadend;
   }
@@ -138,14 +142,17 @@ export class Floor {
     }
     createDeadEnd(Math.round(roomsLeft / 3));
     createDeadEnd(Math.round(roomsLeft / 3 - 1));
+    createDeadEnd(Math.round(roomsLeft / 3 - 2));
+    createDeadEnd(Math.round(roomsLeft / 3 - 3));
 
     const placeSecretRoom = () => {
       const unknownRooms = this.roomsArray.filter((room) => room.getType() == 'unknown');
       const maxRoomNeighbors = unknownRooms.reduce((n, room) => Math.max(n, this.getRoomNeighbors(room)), 0);
       const candidates = unknownRooms.filter((room) => this.getRoomNeighbors(room) == maxRoomNeighbors && !this.isRoomConnectedToBoss(room));
-      // console.log(candidates.length);
+      getRandomElement(candidates).setType("secret");
+      console.log(candidates.length);
     }
-    // placeSecretRoom();
+    placeSecretRoom();
   }
 
   /** Returns the number of undefined neighbors */
