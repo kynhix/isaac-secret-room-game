@@ -7,17 +7,17 @@ const App: Component = () => {
   const getRoomStyle = (room: Room) => {
     let result = '';
     if (room.isDeadEnd()) {
-      return 'bg-red-500';
+      return 'bg-neutral-700';
     }
     switch (room.getType()) {
       case "empty":
-        return room.isOrigin() ? "bg-neutral-400" : "bg-neutral-500";
+        return room.isOrigin() ? "bg-neutral-300" : "bg-neutral-500";
       case "boss":
         return 'bg-red-500';
       case "unknown":
       case "secret":
       case "super-secret":
-        return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors hover:opacity-100';
+        return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors bg-[#fff2] shadow-[#fff6] hover:opacity-100';
       case "treasure":
         return 'bg-yellow-600';
       default:
@@ -37,12 +37,12 @@ const App: Component = () => {
   }
 
   return (
-    <div>
+    <div class='overflow-auto'>
       <div class='flex flex-col min-h-screen h-fit items-center'>
-        <div class='px-8 flex justify-center items-center flex-wrap gap-4 pt-10 w-full'>
-          <h1 class='text-center h-fit text-4xl font-bold text-white tracking-tighter'>The Binding of Isaac: <span class='text-blue-400'>Secret Room Game</span></h1>
+        <div class='px-8 flex flex-wrap gap-4 pt-10 w-full'>
+          <h1 class='h-fit text-4xl p-8 font-bold tracking-tighter text-blue-100 shadow shadow-[#03070CaF] bg-gray-900'>Secret Room Game</h1>
         </div>
-        <div class='flex flex-col justify-center items-center self-stretch flex-grow text-white'>
+        <div class='flex flex-col w-fit min-w-full p-4 justify-center items-center self-stretch flex-grow text-white'>
           <For each={floor().getRooms}>{(row) =>
             <div class='flex flex-row gap-1 mt-1'>
               <For each={row}>{(room) => {
@@ -52,7 +52,7 @@ const App: Component = () => {
                   <div class='relative overflow-visible'>
                     {room.isVisible() &&
                       <div class='w-full h-full absolute outline outline-[16px] outline-neutral-900 bg-neutral-900'></div>}
-                    <div class={`w-16 h-14 rounded-md text-center ${getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
+                    <div class={`w-16 h-14 rounded-md shadow-inner shadow-[#000a] text-center ${getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
                       {/* <div>{room.getDistanceToCenter()}</div> */}
                     </div>
                   </div>
