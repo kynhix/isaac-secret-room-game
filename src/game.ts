@@ -157,9 +157,9 @@ export class Floor {
     createDeadEnd(Math.round(roomsLeft / 3 - 3));
 
     const placeSecretRoom = () => {
-      const unknownRooms = this.roomsArray.filter((room) => room.getType() == 'unknown');
+      const unknownRooms = this.roomsArray.filter((room) => room.getType() == 'unknown' && !this.isRoomConnectedToBoss(room));
       const maxRoomNeighbors = unknownRooms.reduce((n, room) => Math.max(n, this.getRoomNeighbors(room)), 0);
-      const candidates = unknownRooms.filter((room) => this.getRoomNeighbors(room) == maxRoomNeighbors && !this.isRoomConnectedToBoss(room));
+      const candidates = unknownRooms.filter((room) => this.getRoomNeighbors(room) == maxRoomNeighbors);
       if (candidates.length == 0) {
         console.error("FAILED TO PLACE SECRET ROOM ", maxRoomNeighbors)
         return;

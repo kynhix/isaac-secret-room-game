@@ -56,7 +56,6 @@ const App: Component = () => {
     rerun();
   }
 
-  createEffect(() => console.log("testing"))
   return (
     <div class='relative w-fit min-w-full overflow-auto'>
       <div class='w-full min-h-screen h-fit flex flex-col items-center'>
