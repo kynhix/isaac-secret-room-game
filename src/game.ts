@@ -105,6 +105,7 @@ export class Floor {
     this.generateFloor(rooms);
   }
 
+  /** Part of initialization. Randomly generates the room. */
   private generateFloor(totalRooms: number) {
     // initialize spawn room
     this.roomsArray = [new Room(0, 0, 0, false, "unknown")];
@@ -150,7 +151,8 @@ export class Floor {
       const maxRoomNeighbors = unknownRooms.reduce((n, room) => Math.max(n, this.getRoomNeighbors(room)), 0);
       const candidates = unknownRooms.filter((room) => this.getRoomNeighbors(room) == maxRoomNeighbors && !this.isRoomConnectedToBoss(room));
       getRandomElement(candidates).setType("secret");
-      console.log(candidates.length);
+      // const set = new Set<Room>();
+      // console.log(candidates.length);
     }
     placeSecretRoom();
   }

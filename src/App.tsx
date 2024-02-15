@@ -27,9 +27,10 @@ const App: Component = () => {
 
   document.addEventListener("keypress", (ev) => {
     if (ev.key == 'r') {
-      setFloor(new Floor());
+      setFloor(new Floor(100));
     }
-  })
+    ev.preventDefault();
+  });
 
   /** Called when a room is clicked */
   const onClickRoom = (room: Room) => {
@@ -37,10 +38,13 @@ const App: Component = () => {
   }
 
   return (
-    <div class='overflow-auto'>
-      <div class='flex flex-col min-h-screen h-fit items-center'>
-        <div class='px-8 flex flex-wrap gap-4 pt-10 w-full'>
-          <h1 class='h-fit text-4xl p-8 font-bold tracking-tighter text-blue-100 shadow shadow-[#03070CaF] bg-gray-900'>Secret Room Game</h1>
+    <div class='relative w-fit min-w-full overflow-auto'>
+      <div class='w-full min-h-screen h-fit flex flex-col items-center'>
+        <div class='p-8 flex justify-between w-full'>
+          <h1 class='text-3xl px-8 py-6 font-bold tracking-tighter text-blue-100 shadow shadow-[#03070CaF] bg-gray-900'>Secret Room Game</h1>
+          <div class='p-6 text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] bg-gray-900'>
+            <svg fill="#eff6ff" height="40px" width="40px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1792 1792" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>fiction</title> <path d="M1673.9,1363.2L1673.9,1363.2c0,52.3-42.4,94.3-94.3,94.3H212.7c-52.3,0-94.3-42.4-94.3-94.3l0,0 c0-52.3,42.4-94.3,94.3-94.3h1366.8C1631.5,1268.5,1673.9,1310.9,1673.9,1363.2z"></path> <path d="M1673.9,895.6L1673.9,895.6c0,52.3-42.4,94.3-94.3,94.3H213c-52.3,0-94.3-42.4-94.3-94.3l0,0c0-52.3,42.4-94.3,94.3-94.3 h1366.6C1631.5,800.8,1673.9,843.2,1673.9,895.6z"></path> <path d="M1673.9,427.9L1673.9,427.9c0,52.3-42.4,94.3-94.3,94.3H212.7c-52.3,0-94.3-42.4-94.3-94.3l0,0c0-52.3,42.4-94.3,94.3-94.3 h1366.8C1631.5,333.2,1673.9,375.6,1673.9,427.9z"></path> </g></svg>
+          </div>
         </div>
         <div class='flex flex-col w-fit min-w-full p-4 justify-center items-center self-stretch flex-grow text-white'>
           <For each={floor().getRooms}>{(row) =>
@@ -64,8 +68,8 @@ const App: Component = () => {
           }</For>
         </div>
       </div>
-      <div class='h-24 p-4 flex flex-col justify-end'>
-        <div class="text-white">Made with SolidJS and TailwindCSS.</div>
+      <div class='h-24 p-4 flex flex-col justify-end bg-gray-900'>
+        <div class="text-blue-50">Made with SolidJS and TailwindCSS.</div>
       </div>
     </div>
   );
