@@ -1,23 +1,29 @@
-import { For, createSignal, type Component, Show } from 'solid-js';
+import { For, createSignal, type Component, Show, createEffect } from 'solid-js';
 import { Floor, Room } from './game';
 
 const App: Component = () => {
-  const [floor, setFloor] = createSignal(new Floor());
+  const [floor, setFloor] = createSignal(new Floor(), { equals: false });
 
   const getRoomStyle = (room: Room) => {
     let result = '';
-    if (room.isDeadEnd()) {
-      return 'bg-neutral-700';
-    }
     switch (room.getType()) {
       case "empty":
-        return room.isOrigin() ? "bg-neutral-300" : "bg-neutral-500";
+        if (room.isOrigin()) {
+          return 'bg-stone-300'
+        }
+        if (room.isDeadEnd()) {
+          return 'bg-stone-700';
+        }
+        return "bg-stone-500";
       case "boss":
         return 'bg-red-500';
       case "unknown":
       case "secret":
       case "super-secret":
-        return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors bg-[#fff2] shadow-[#fff6] hover:opacity-100';
+        if (!room.isVisible()) {
+          return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors bg-[#fff2] shadow-[#fff6] hover:opacity-100';
+        }
+        return room.getType() == 'unknown' ? 'border-black bg-stone-900' : 'bg-blue-500 animate-pulse';
       case "treasure":
         return 'bg-yellow-600';
       default:
@@ -27,16 +33,30 @@ const App: Component = () => {
 
   document.addEventListener("keypress", (ev) => {
     if (ev.key == 'r') {
-      setFloor(new Floor(100));
+      setFloor(new Floor());
     }
     ev.preventDefault();
   });
 
+  const [depend, rerun] = createSignal(undefined, { equals: false });
   /** Called when a room is clicked */
   const onClickRoom = (room: Room) => {
+    if (room.getType() == 'unknown') {
+      // Wrong room
+    } else if (room.getType() == 'secret') {
+
+    }
+    if (!room.isVisible()) {
+      room.setVisible(true);
+    }
     console.log(room);
+    setFloor((floor) => {
+      return floor;
+    })
+    rerun();
   }
 
+  createEffect(() => console.log("testing"))
   return (
     <div class='relative w-fit min-w-full overflow-auto'>
       <div class='w-full min-h-screen h-fit flex flex-col items-center'>
@@ -47,16 +67,16 @@ const App: Component = () => {
           </div>
         </div>
         <div class='flex flex-col w-fit min-w-full p-4 justify-center items-center self-stretch flex-grow text-white'>
-          <For each={floor().getRooms}>{(row) =>
+          <For each={floor().getRooms()}>{(row) =>
             <div class='flex flex-row gap-1 mt-1'>
               <For each={row}>{(room) => {
                 // console.log(row.length)
                 return room &&
                   // Rooms are 8:7
                   <div class='relative overflow-visible'>
-                    {room.isVisible() &&
-                      <div class='w-full h-full absolute outline outline-[16px] outline-neutral-900 bg-neutral-900'></div>}
-                    <div class={`w-16 h-14 rounded-md shadow-inner shadow-[#000a] text-center ${getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
+                    {!depend() && room.isVisible() &&
+                      <div class='w-full h-full absolute outline outline-[16px] outline-stone-900 bg-neutral-900'></div>}
+                    <div class={`w-16 h-14 rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
                       {/* <div>{room.getDistanceToCenter()}</div> */}
                     </div>
                   </div>

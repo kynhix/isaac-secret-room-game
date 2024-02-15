@@ -13,6 +13,8 @@ export class Room {
   private distToCenter: number;
   private position: { row: number, column: number };
   private deadEnd: boolean;
+  /** Only relevant to unknown, secret, and super-secret rooms */
+  private visible: boolean = false;
   private connections: number;
 
   constructor(row: number, column: number, dist: number, deadEnd: boolean, type: RoomType = "empty") {
@@ -52,7 +54,14 @@ export class Room {
   }
 
   isVisible() {
-    return this.type != 'unknown' && this.type != 'secret' && this.type != 'super-secret';
+    if (this.type != 'unknown' && this.type != 'secret' && this.type != 'super-secret') {
+      return true;
+    }
+    return this.visible;
+  }
+
+  setVisible(visibility: boolean) {
+    this.visible = visibility;
   }
 
   setDeadEnd(deadend: boolean) {
@@ -114,7 +123,7 @@ export class Floor {
     // running total of rooms left to create
     let roomsLeft = totalRooms;
 
-    const createDeadEnd = (maxDist: number) => {
+    const createDeadEnd = (maxDist: number, type: RoomType = "empty") => {
       const branchFilter = (room: Room) => {
         return room.getDistanceToCenter() <= maxDist
           && this.getUndefinedNeighbors(room)
@@ -131,17 +140,18 @@ export class Floor {
       let room: Room | undefined;
       for (let i = 0; i < maxDist; ++i) {
         room = getRandomElement(rooms);
-        this.placeRoom(room.row, room.column, "empty");
+        this.placeRoom(room.row, room.column, 'empty');
         rooms = Object.values(this.getNeighbors(room)).filter(branchFilter)
         if (!rooms.length) {
-          // console.warn("Had to end early")
           room.setDeadEnd(true);
+          room.setType(type)
           return;
         }
       }
       room?.setDeadEnd(true);
+      room?.setType(type);
     }
-    createDeadEnd(Math.round(roomsLeft / 3));
+    createDeadEnd(Math.round(roomsLeft / 3), "boss");
     createDeadEnd(Math.round(roomsLeft / 3 - 1));
     createDeadEnd(Math.round(roomsLeft / 3 - 2));
     createDeadEnd(Math.round(roomsLeft / 3 - 3));
@@ -150,6 +160,10 @@ export class Floor {
       const unknownRooms = this.roomsArray.filter((room) => room.getType() == 'unknown');
       const maxRoomNeighbors = unknownRooms.reduce((n, room) => Math.max(n, this.getRoomNeighbors(room)), 0);
       const candidates = unknownRooms.filter((room) => this.getRoomNeighbors(room) == maxRoomNeighbors && !this.isRoomConnectedToBoss(room));
+      if (candidates.length == 0) {
+        console.error("FAILED TO PLACE SECRET ROOM ", maxRoomNeighbors)
+        return;
+      }
       getRandomElement(candidates).setType("secret");
       // const set = new Set<Room>();
       // console.log(candidates.length);
@@ -280,7 +294,7 @@ export class Floor {
     return neighbors;
   }
 
-  get getRooms() {
+  getRooms() {
     return this.roomsMatrix;
   }
 }
