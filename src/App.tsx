@@ -22,7 +22,7 @@ const App: Component = () => {
       case "secret":
       case "super-secret":
         if (!room.isVisible()) {
-          return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors bg-[#fff2] shadow-[#fff6] hover:opacity-100';
+          return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors bg-[#fff2] shadow-[#fff6] focus:opacity-100 hover:opacity-100';
         }
         return room.getType() == 'unknown' ? 'border-black bg-stone-900' : 'bg-blue-500 animate-pulse';
       case "treasure":
@@ -80,7 +80,7 @@ const App: Component = () => {
                   <div class='relative overflow-visible'>
                     {!depend() && room.isVisible() &&
                       <div style={room.alwaysVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-full h-full ${room.alwaysVisible() && 'animate-fademovein opacity-0'} absolute outline outline-[16px] outline-stone-900 bg-neutral-900`}></div>}
-                    <div style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
+                    <div tabindex="0" style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
                       {/* <div>{room.getDistanceToCenter()}</div> */}
                     </div>
                   </div>
