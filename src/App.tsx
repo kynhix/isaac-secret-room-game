@@ -3,6 +3,7 @@ import { Floor, Room } from './game';
 
 const App: Component = () => {
   const [floor, setFloor] = createSignal(new Floor(), { equals: false });
+  let generating = true;
 
   const getRoomStyle = (room: Room) => {
     let result = '';
@@ -30,6 +31,10 @@ const App: Component = () => {
         return 'bg-white';
     }
   }
+
+  createEffect(() => {
+    generating = false;
+  })
 
   document.addEventListener("keypress", (ev) => {
     if (ev.key == 'r') {
@@ -74,8 +79,8 @@ const App: Component = () => {
                   // Rooms are 8:7
                   <div class='relative overflow-visible'>
                     {!depend() && room.isVisible() &&
-                      <div class='w-full h-full absolute outline outline-[16px] outline-stone-900 bg-neutral-900'></div>}
-                    <div class={`w-16 h-14 rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
+                      <div style={room.alwaysVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-full h-full ${room.alwaysVisible() && 'animate-fademovein opacity-0'} absolute outline outline-[16px] outline-stone-900 bg-neutral-900`}></div>}
+                    <div style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
                       {/* <div>{room.getDistanceToCenter()}</div> */}
                     </div>
                   </div>

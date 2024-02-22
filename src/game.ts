@@ -54,10 +54,14 @@ export class Room {
   }
 
   isVisible() {
-    if (this.type != 'unknown' && this.type != 'secret' && this.type != 'super-secret') {
+    if (this.alwaysVisible()) {
       return true;
     }
     return this.visible;
+  }
+
+  alwaysVisible() {
+    return this.type != 'unknown' && this.type != 'secret' && this.type != 'super-secret'
   }
 
   setVisible(visibility: boolean) {
