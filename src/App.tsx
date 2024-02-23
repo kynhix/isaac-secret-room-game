@@ -80,7 +80,7 @@ const App: Component = () => {
                   <div class='relative overflow-visible'>
                     {!depend() && room.isVisible() &&
                       <div style={room.alwaysVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-full h-full ${room.alwaysVisible() && 'animate-fademovein opacity-0'} absolute outline outline-[16px] outline-stone-900 bg-neutral-900`}></div>}
-                    <div tabindex="0" style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
+                    <div onKeyPress={(e) => e.key == 'Enter' && onClickRoom(room)} tabindex={!depend() && !room.isVisible() && "0"} style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
                       {/* <div>{room.getDistanceToCenter()}</div> */}
                     </div>
                   </div>
