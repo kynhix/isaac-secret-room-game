@@ -98,8 +98,12 @@ const App: Component = () => {
               {streak()}
             </div>
           </div>
-          <button onclick={resetGame} class='p-2 rounded-full text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] transition-all bg-gray-900'>
-            <svg class="hover:rotate-[181deg] transition-all" width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 3V8M3 8H8M3 8L6 5.29168C7.59227 3.86656 9.69494 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.71683 21 4.13247 18.008 3.22302 14" stroke="#f0f9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+          <button onclick={resetGame} class={`p-2 rounded-full text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] transition-all ${isWon() ? 'bg-emerald-950' : 'bg-gray-900'}`}>
+            <Show
+              when={isWon()}
+              fallback={<svg class="hover:rotate-[181deg] transition-all" width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 3V8M3 8H8M3 8L6 5.29168C7.59227 3.86656 9.69494 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.71683 21 4.13247 18.008 3.22302 14" stroke="#f0f9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>}>
+              <svg width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#dcfce7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </Show>
           </button>
         </div>
         <div class="flex m-auto w-full h-full overflow-auto self-center">
@@ -129,6 +133,18 @@ const App: Component = () => {
       <div class='h-24 p-4 flex flex-col justify-end bg-gray-900'>
         <div class="text-blue-50">Made with SolidJS and TailwindCSS.</div>
       </div>
+      <Show when={isWon()}>
+        <div class='flex fixed flex-col gap-7 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-gray-950 bg-gray-700'>
+          <h1 class='text-4xl font-bold tracking-tighter text-blue-50 w-fit text-center'>You found the <span class='text-blue-400'>Secret Room!</span></h1>
+          <button onclick={regenerateFloor} class='m-auto bg-green-200 p-4 text-lg font-semibold text-green-900 hover:shadow hover:shadow-black transition-all'>New Floor</button>
+        </div>
+      </Show>
+      <Show when={health() == 0}>
+        <div class='flex fixed flex-col gap-4 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-stone-950 bg-stone-700'>
+          <h1 class='w-full text-4xl font-bold tracking-tighter text-blue-50 text-center'>You rain out of <span class='text-red-400'>lives!</span></h1>
+          <button onclick={regenerateFloor} class='m-auto bg-red-200 p-4 text-lg text-red-950 hover:shadow hover:shadow-black transition-all'>New Game</button>
+        </div>
+      </Show>
     </div>
   );
 };
