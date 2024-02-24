@@ -130,8 +130,13 @@ const App: Component = () => {
           </div>
         </div>
       </div>
-      <div class='h-24 p-4 flex flex-col justify-end bg-gray-900'>
-        <div class="text-blue-50">Made with SolidJS and TailwindCSS.</div>
+      <div class='h-fit p-4 flex flex-col justify-end bg-gray-900 text-blue-50'>
+        <h2 class="text-blue-50 text-xl font-semibold">How to play:</h2>
+        <p>
+          Secret rooms are always in adjecent squares to the most connecting rooms.<br />
+          With one exception, a secret room will <span>never</span> be adjacent to a red room.
+        </p>
+        <p class="text-blue-50 mt-10">Made with SolidJS and TailwindCSS.</p>
       </div>
       <Show when={isWon()}>
         <div class='flex fixed flex-col gap-7 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-gray-950 bg-gray-700'>
@@ -141,7 +146,7 @@ const App: Component = () => {
       </Show>
       <Show when={health() == 0}>
         <div class='flex fixed flex-col gap-4 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-stone-950 bg-stone-700'>
-          <h1 class='w-full text-4xl font-bold tracking-tighter text-blue-50 text-center'>You rain out of <span class='text-red-400'>lives!</span></h1>
+          <h1 class='w-full text-4xl font-bold tracking-tighter text-blue-50 text-center'>You ran out of <span class='text-red-400'>lives!</span></h1>
           <button onclick={regenerateFloor} class='m-auto bg-red-200 p-4 text-lg text-red-950 hover:shadow hover:shadow-black transition-all'>New Game</button>
         </div>
       </Show>
