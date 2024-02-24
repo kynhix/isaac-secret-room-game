@@ -89,6 +89,7 @@ export class Floor {
   private roomsMatrix: Array<Array<Room | undefined>> = [[]];
   private roomsArray: Array<Room> = [];
   private offset: { row: number, column: number } = { row: 0, column: 0 }
+  public possibleSecretRooms = 0;
 
   private getRowIndex(row: number) {
     return row + this.offset.row;
@@ -168,6 +169,7 @@ export class Floor {
         console.error("FAILED TO PLACE SECRET ROOM ", maxRoomNeighbors)
         return;
       }
+      this.possibleSecretRooms = candidates.length;
       getRandomElement(candidates).setType("secret");
       // const set = new Set<Room>();
       // console.log(candidates.length);
