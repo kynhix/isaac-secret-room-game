@@ -37,11 +37,15 @@ const App: Component = () => {
     }
   }
 
+  const setFocus = (el: HTMLElement) => setTimeout(() => el.focus());
+  let resetButton: HTMLButtonElement | undefined = undefined;
+
   const regenerateFloor = () => {
     const floor = new Floor(difficulty());
     setFloor(floor);
     setHealth(floor.possibleSecretRooms);
     setWon(false);
+    resetButton?.focus();
   }
 
   const resetGame = () => {
@@ -56,6 +60,9 @@ const App: Component = () => {
   document.addEventListener("keypress", (ev) => {
     if (ev.key == 'r') {
       isWon() ? regenerateFloor() : resetGame();
+    }
+    if (ev.key == 'Enter' && document.activeElement !== null && (document.activeElement as HTMLButtonElement).click) {
+      (document.activeElement as HTMLButtonElement).click();
     }
     ev.preventDefault();
   });
@@ -75,7 +82,7 @@ const App: Component = () => {
     if (!room.isVisible()) {
       room.setVisible(true);
     }
-    console.log(room);
+    // console.log(room);
     setFloor((floor) => {
       return floor;
     })
@@ -85,7 +92,7 @@ const App: Component = () => {
   return (
     <div class='relative w-full overflow-y-auto'>
       <div class='w-full min-h-screen h-fit flex flex-col'>
-        <div class='p-4 sm:p-8 flex justify-between w-full'>
+        <div class='p-4 sm:p-8 flex flex-wrap gap-2 justify-between w-full'>
           <h1 class='hidden md:block text-2xl lg:text-3xl px-8 py-6 font-bold tracking-tighter text-blue-100 shadow shadow-[#03070CaF] bg-gray-900'>Secret Room Game</h1>
           <div class="flex gap-2">
             <div class='flex gap-2 items-center text-3xl tracking-tight font-bold p-2 pr-4 bg-gray-900 shadow shadow-[#03070CaF] text-rose-100'>
@@ -97,7 +104,7 @@ const App: Component = () => {
               {streak()}
             </div>
           </div>
-          <button onclick={isWon() ? regenerateFloor : resetGame} class={`p-2 rounded-full text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] transition-all ${isWon() ? 'bg-emerald-100' : 'bg-gray-900'}`}>
+          <button ref={resetButton} onclick={isWon() ? regenerateFloor : resetGame} class={`p-2 rounded-full text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] transition-all ${isWon() ? 'bg-emerald-100' : 'bg-gray-900'}`}>
             <Show
               when={isWon()}
               fallback={<svg class="hover:rotate-[181deg] transition-all" width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 3V8M3 8H8M3 8L6 5.29168C7.59227 3.86656 9.69494 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.71683 21 4.13247 18.008 3.22302 14" stroke="#f0f9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>}>
@@ -116,7 +123,7 @@ const App: Component = () => {
                     <div class='relative overflow-visible'>
                       {!depend() && room.isVisible() &&
                         <div style={room.alwaysVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-full h-full ${room.alwaysVisible() && 'animate-fademovein opacity-0'} absolute outline outline-[16px] outline-stone-900 bg-neutral-900`}></div>}
-                      <div onKeyPress={(e) => e.key == 'Enter' && onClickRoom(room)} tabindex={!depend() && !room.isVisible() && "0"} style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
+                      <div onKeyPress={(e) => e.key == 'Enter' && onClickRoom(room)} tabindex={!depend() && !room.isVisible() && health() != 0 && !isWon() && "0" || "-1"} style={room.alwaysVisible() && room.isVisible() && `animation-delay: ${room.getDistanceToCenter() * 50}ms` || ''} class={`w-16 h-14 ${room.alwaysVisible() && 'animate-fademovein opacity-0'} rounded-md shadow-inner shadow-[#000a] text-center ${!depend() && getRoomStyle(room)} z-10 relative`} onclick={() => onClickRoom(room)}>
                         {/* <div>{room.getDistanceToCenter()}</div> */}
                       </div>
                     </div>
@@ -148,13 +155,13 @@ const App: Component = () => {
       <Show when={isWon()}>
         <div class='flex fixed flex-col gap-7 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-stone-950 bg-stone-700'>
           <h1 class='text-4xl font-bold tracking-tighter text-stone-50 w-fit text-center'>You found the <span class='text-blue-300'>Secret Room!</span></h1>
-          <button onclick={regenerateFloor} class='m-auto bg-green-200 p-4 text-lg font-semibold text-green-900 hover:shadow hover:shadow-black transition-all'>New Floor</button>
+          <button tabindex='0' ref={setFocus} onclick={regenerateFloor} class='m-auto bg-green-200 p-4 text-lg font-semibold text-green-900 hover:shadow hover:shadow-black transition-all'>New Floor</button>
         </div>
       </Show>
       <Show when={health() == 0}>
         <div class='flex fixed flex-col gap-4 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-stone-950 bg-stone-700'>
           <h1 class='w-full text-4xl font-bold tracking-tighter text-stone-50 text-center'>You ran out of <span class='text-red-400'>lives!</span></h1>
-          <button onclick={resetGame} class='m-auto bg-red-200 p-4 text-lg text-red-950 hover:shadow hover:shadow-black transition-all'>New Game</button>
+          <button tabindex='0' ref={setFocus} onclick={resetGame} class='m-auto bg-red-200 p-4 text-lg text-red-950 hover:shadow hover:shadow-black transition-all'>New Game</button>
         </div>
       </Show>
     </div>
