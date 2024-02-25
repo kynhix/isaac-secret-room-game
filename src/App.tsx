@@ -137,6 +137,7 @@ const App: Component = () => {
         </p>
         <br />
         <h2 class="text-blue-50 text-xl font-semibold">Difficulty: </h2>
+        <h2 class="text-blue-50">Note: Changes will take effect on next floor.</h2>
         <div class="flex gap-4">
           <button onclick={() => setDifficulty(20)} class={`${difficulty() == 20 ? 'bg-gray-200' : 'bg-gray-950'} p-3 w-24 text-lg ${difficulty() == 20 ? 'text-gray-950' : 'text-gray-50'} hover:shadow hover:shadow-black transition-all`}>Easy</button>
           <button onclick={() => setDifficulty(30)} class={`${difficulty() == 30 ? 'bg-gray-200' : 'bg-gray-950'} p-3 w-24 text-lg ${difficulty() == 30 ? 'text-gray-950' : 'text-gray-50'} hover:shadow hover:shadow-black transition-all`}>Medium</button>
