@@ -6,6 +6,7 @@ const App: Component = () => {
   const [streak, setStreak] = createSignal(0);
   const [health, setHealth] = createSignal(3);
   const [isWon, setWon] = createSignal(false);
+  const [difficulty, setDifficulty] = createSignal(20);
 
   let generating = true;
 
@@ -28,7 +29,7 @@ const App: Component = () => {
         if (!room.isVisible()) {
           return 'cursor-pointer opacity-0 border-2 border-white transition-opacity transition-colors bg-[#fff2] shadow-[#fff6] focus:opacity-100 hover:opacity-100';
         }
-        return room.getType() == 'unknown' ? 'border-black bg-stone-900' : 'bg-blue-500 animate-pulse';
+        return room.getType() == 'unknown' ? 'border border-stone-400 bg-stone-900' : 'bg-blue-500 animate-pulse';
       case "treasure":
         return 'bg-yellow-600';
       default:
@@ -37,16 +38,14 @@ const App: Component = () => {
   }
 
   const regenerateFloor = () => {
-    const floor = new Floor();
+    const floor = new Floor(difficulty());
     setFloor(floor);
     setHealth(floor.possibleSecretRooms);
     setWon(false);
   }
 
   const resetGame = () => {
-    if (!isWon()) {
-      setStreak(0);
-    }
+    setStreak(0);
     regenerateFloor();
   }
 
@@ -56,7 +55,7 @@ const App: Component = () => {
 
   document.addEventListener("keypress", (ev) => {
     if (ev.key == 'r') {
-      resetGame();
+      isWon() ? regenerateFloor() : resetGame();
     }
     ev.preventDefault();
   });
@@ -98,11 +97,11 @@ const App: Component = () => {
               {streak()}
             </div>
           </div>
-          <button onclick={resetGame} class={`p-2 rounded-full text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] transition-all ${isWon() ? 'bg-emerald-950' : 'bg-gray-900'}`}>
+          <button onclick={isWon() ? regenerateFloor : resetGame} class={`p-2 rounded-full text-4xl font-bold text-blue-100 shadow shadow-[#03070CaF] transition-all ${isWon() ? 'bg-emerald-100' : 'bg-gray-900'}`}>
             <Show
               when={isWon()}
               fallback={<svg class="hover:rotate-[181deg] transition-all" width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 3V8M3 8H8M3 8L6 5.29168C7.59227 3.86656 9.69494 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.71683 21 4.13247 18.008 3.22302 14" stroke="#f0f9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>}>
-              <svg width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#dcfce7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+              <svg width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#064e3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             </Show>
           </button>
         </div>
@@ -136,18 +135,25 @@ const App: Component = () => {
           Secret rooms are always in adjecent squares to the most connecting rooms.<br />
           With one exception, a secret room will <span>never</span> be adjacent to a red room.
         </p>
+        <br />
+        <h2 class="text-blue-50 text-xl font-semibold">Difficulty: </h2>
+        <div class="flex gap-4">
+          <button onclick={() => setDifficulty(20)} class={`${difficulty() == 20 ? 'bg-gray-200' : 'bg-gray-950'} p-3 w-24 text-lg ${difficulty() == 20 ? 'text-gray-950' : 'text-gray-50'} hover:shadow hover:shadow-black transition-all`}>Easy</button>
+          <button onclick={() => setDifficulty(30)} class={`${difficulty() == 30 ? 'bg-gray-200' : 'bg-gray-950'} p-3 w-24 text-lg ${difficulty() == 30 ? 'text-gray-950' : 'text-gray-50'} hover:shadow hover:shadow-black transition-all`}>Medium</button>
+          <button onclick={() => setDifficulty(40)} class={`${difficulty() == 40 ? 'bg-gray-200' : 'bg-gray-950'} p-3 w-24 text-lg ${difficulty() == 40 ? 'text-gray-950' : 'text-gray-50'} hover:shadow hover:shadow-black transition-all`}>Hard</button>
+        </div>
         <p class="text-blue-50 mt-10">Made with SolidJS and TailwindCSS.</p>
       </div>
       <Show when={isWon()}>
-        <div class='flex fixed flex-col gap-7 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-gray-950 bg-gray-700'>
-          <h1 class='text-4xl font-bold tracking-tighter text-blue-50 w-fit text-center'>You found the <span class='text-blue-400'>Secret Room!</span></h1>
+        <div class='flex fixed flex-col gap-7 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-stone-950 bg-stone-700'>
+          <h1 class='text-4xl font-bold tracking-tighter text-stone-50 w-fit text-center'>You found the <span class='text-blue-300'>Secret Room!</span></h1>
           <button onclick={regenerateFloor} class='m-auto bg-green-200 p-4 text-lg font-semibold text-green-900 hover:shadow hover:shadow-black transition-all'>New Floor</button>
         </div>
       </Show>
       <Show when={health() == 0}>
         <div class='flex fixed flex-col gap-4 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 min-w-80 p-8 shadow-lg shadow-stone-950 bg-stone-700'>
-          <h1 class='w-full text-4xl font-bold tracking-tighter text-blue-50 text-center'>You ran out of <span class='text-red-400'>lives!</span></h1>
-          <button onclick={regenerateFloor} class='m-auto bg-red-200 p-4 text-lg text-red-950 hover:shadow hover:shadow-black transition-all'>New Game</button>
+          <h1 class='w-full text-4xl font-bold tracking-tighter text-stone-50 text-center'>You ran out of <span class='text-red-400'>lives!</span></h1>
+          <button onclick={resetGame} class='m-auto bg-red-200 p-4 text-lg text-red-950 hover:shadow hover:shadow-black transition-all'>New Game</button>
         </div>
       </Show>
     </div>
