@@ -1,14 +1,24 @@
-## Usage
+## [Live Demo](https://secret-room-game.kynhix.dev/)
+You can check out the live demo on my website with the link above.
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+# Overview
+This is a game based on finding the secret room in The Binding of Isaac. The game had to be simplified since it is just a metagame within Isaac. Because of this simpliciation, this game is not a carbon copy of how Isaac generates secret rooms. If you would like to learn more about how Isaac does secret room generation, you can read about it [here](https://bindingofisaacrebirth.fandom.com/wiki/Secret_Room). This game has some similar rules to how the secret room will spawn:
+1. Secret rooms will always spawn in a square adjacent to as many rooms as possible.
+2. There can be many candidates for where the secret room _can_ spawn.
+3. The secret room _cannot_ spawn adjacent to a **red** room.
+4. You will always have enough lives to try every possible candidate.
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+## Future Goals
+I would like to add a super secret room. An idea is any extra lives you have left over you can risk to find the super secret room. I also would like to add some different variations to the dead ends (the darker gray squares with only 1 neighboring square). Variations on the normal empty rooms is another possibilty to spice up the game. This is a side project of mine, so it is not the main focus of my attention. Updates might not happen regularly and be infrequent.
+
+## Dependencies
+This project uses [Solid](https://www.solidjs.com/) and [TailwindCSS](https://tailwindcss.com/).
+
+## Installation
 
 ```bash
-$ npm install # or pnpm install or yarn install
+$ npm install
 ```
-
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
 
 ## Available Scripts
 
